@@ -1,0 +1,28 @@
+{
+  "recipes": [
+    {
+      "name": "",
+      "altName": "",
+      "type":  "drink|ingredient|food",
+      "about": "",
+      "image": "",
+      "instructions": [
+        ""
+      ],
+      "ingredients": [
+        {
+          "name": "",
+          "amount": "",
+          "notes": ""
+        }
+      ],
+      "tags": [
+        ""
+      ],
+      "notes": "",
+      "alcoholic": true,
+      "glassware": "",
+      "garnish": ""
+    }
+  ]
+}
