@@ -1,41 +1,40 @@
 # Active Context
 
-## Recent Updates
+This file tracks the project's current status, including recent changes, current goals, and open questions.
 
-### Favorite Icon Fix in Recipe Detail Screen (Latest)
+2025-03-18 21:48:13 - Updated with existing technical context
 
-Fixed an issue where the favorite icon in the recipe detail screen was:
-1. Not visually consistent with the list view 
-2. Not functioning when clicked
+## Current Focus
 
-The fix involved:
-- Using the same theme-based styling for the favorite icon in both views
-- Reusing the same controller logic (RecipeListController) for toggling favorites as used in the list view
-- Properly invalidating the provider to ensure UI updates
+* Integration of established technology stack:
+  - Riverpod for state management
+  - Supabase for backend services
+  - Drift for local database
+  - PowerSync for data synchronization
+  - Flutter Quill for rich text editing
 
-### Recipe Edit Screen Bug Fixes
+* Implementation of UI/UX standards:
+  - Material 3 theming
+  - Accessibility requirements
+  - Form field patterns
+  - State management patterns
 
-We've fixed three bugs in the recipe editing functionality:
+## Recent Changes
 
-1. **Recipe Name and Alternative Name preservation** - Fixed an issue where these fields would disappear when updating other form elements by:
-   - Adding text controller listeners to detect changes
-   - Creating an `updateRecipe` method in the controller for direct state updates
-   - Implementing proper state management to avoid text field resets
+* Updated Memory Bank with existing technical decisions
+* Incorporated established UI patterns and rules
+* Documented technology stack choices
+* Added specific implementation guidelines
 
-2. **Ingredient Unit Field Enhancement** - Fixed an issue where the unit field would only show one letter by:
-   - Removing character limits on the field
-   - Setting appropriate keyboard type and display configuration
-   - Adding proper text input constraints
+## Open Questions/Issues
 
-3. **Newly Added Items Display** - Fixed an issue where newly added items wouldn't show in lists after saving by:
-   - Improving state management in the RecipeEditController
-   - Adding proper provider invalidation for connected views
-   - Ensuring recipe data is properly refreshed on save operations
-
-### Flutter Quill Integration
-
-We recently fixed two issues with the Flutter Quill implementation:
-
-1. **Added proper localization support** - Fixed the "unimplemented error: FlutterQuillLocalizations instance is required and could not be found" by:
-   - Adding `flutter_localizations` package to dependencies in pubspec.yaml
-   - Adding required localization delegates to the MaterialApp in lib/presentation/app.dart:
+* PowerSync and Drift integration strategy
+* Flutter Quill localization setup details
+* Provider invalidation patterns for list updates
+* Theme configuration for both light and dark modes
+* Testing strategy for offline-first functionality
+* State preservation approach for form fields
+* Conflict resolution strategy for offline changes
+* Performance optimization for rich text editing
+* Image handling and storage approach
+* Deep linking implementation plan

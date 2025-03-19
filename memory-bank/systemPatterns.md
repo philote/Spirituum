@@ -1,92 +1,119 @@
-## App architectural principles to follow
-### Riverpod Architecture
-- Documentation: https://codewithandrea.com/articles/flutter-app-architecture-riverpod-introduction/
-### Layer-first Project structure
-- data
-    - The data layer contains three types of classes:
-        - Data Sources, which are 3rd party APIs used to communicate with the outside world (e.g. a remote database, a REST API client, a push notification system, a Bluetooth interface).
-        - Data Transfer Objects (or DTOs), which are returned by the data sources. DTOs are often represented as unstructured data (such as JSON) when sending data over the network
-        - Repositories, which are used to access DTOs from various sources, such as a backend API, and make them available as type-safe model classes (a.k.a. entities) to the rest of the app.
-- domain
-    - The primary role of the domain layer is to define application-specific model classes that represent the data that comes from the data layer. Model classes are simple data classes and have the following requirements:
-        - They are always immutable.
-        - They contain serialization logic (such as fromJson and toJson methods).
-        - They implement the == operator and the hashCode method.
-- application (optional layer)
-    - Contains service classes, which act as the middle-man between the controllers (which only manage the widget state) and the repositories (which talk to different data sources)
-    - Only use when writing logic that:
-        - depends on multiple data sources or repositories
-        - needs to be used (shared) by more than one widget
-- presentation
-    - the presentation layer contains two main types of components:
-        - Widgets, which are a representation of the data to be displayed on screen.
-        - Controllers, which perform asynchronous data mutations and manage the widget state.
-### Repository Pattern
-- Use to access data objects from various sources, such as a backend API, and make them available as type-safe entities to the domain layer of the app
-- Repositories are found in the data layer. And their job is to:
-    - isolate domain models (or entities) from the implementation details of the data sources in the data layer.
-    - convert data transfer objects to validated entities that are understood by the domain layer
-    - (optionally) perform operations such as data caching.
-### Follow these principles:
-- Separation of concerns: UI-based classes should only contain logic that handles UI and operating system interactions.
-- Single source of truth: When a new data type is defined in the app, assign a Single Source of Truth (SSOT) to it. The SSOT is the owner of that data, and only the SSOT can modify or mutate it. The SSOT exposes the data using an immutable type, and to modify the data, the SSOT exposes functions or receive events that other types can call.
-- Unidirectional Data Flow: state flows in only one direction. The events that modify the data flow in the opposite direction.
-- State is immutable and centralized
-- State changes are explicit and predictable
-- UI is a function of state
-- Business logic is isolated from UI
-- Dependency injection best practices.
-- A reactive and layered architecture.
-- Unidirectional Data Flow (UDF) in all layers of the app.
+# System Patterns
 
-### Diagram of the app Dependency flow
-```mermaid
-graph TD;
-    subgraph A ["Presentation Layer"]
-        A1(Widgets)
-        A2(States)
-        A3(Controllers)
-    end
-    subgraph B ["Application Layer (Optional)"]
-        B1(Services)
-    end
-    subgraph C ["Domain Layer"]
-      C1(Models)
-    end
-    subgraph D ["Data Layer"]
-      D1(Repositories)
-      D2(DTOs)
-      D3(Data Sources)
-    end
-    A1-->A2
-    A2-->A3
-    A3-->B1
-    B1-->C1
-    D1-->D2
-    D2-->D3
-    D3-->C1
-```
+This file documents recurring patterns and standards used in the project.
 
-## Data
-- Recipe
-    - name [String]
-    - altName [String]
-    - image [String of Path to image]
-    - about [markdown or rich text]
-    - tags [List of tag]
-        - tag  [String]
-    - instructions [List of instruction]
-        - instruction  [Object]
-            - value [markdown or rich text]
-            - step [Number]
-    - notes [markdown or rich text]
-    - alcoholic [Boolean]
-    - glassware [String]
-    - garnish [String]
-    - ingredients [List of ingredient]
-        - ingredient [Object]
-            - name [String]
-            - amount [Object]
-                - value [Number]
-                - label [String]
-            - notes [markdown or rich text]
+2025-03-18 21:47:52 - Updated with established patterns
+
+## Coding Patterns
+
+### Architecture Patterns
+* Clean Architecture layers:
+  - Domain: Pure business logic and entities
+  - Data: Repositories and data sources
+  - Application: Use cases and services
+  - Presentation: UI and state management
+
+### State Management Patterns
+* Riverpod Implementation:
+  - Controllers for data persistence
+  - Local state for UI-only changes
+  - Provider invalidation for list updates
+  - Reuse controller logic across views
+
+### Documentation Standards
+* Doc Comments:
+  - Use `///` for public APIs
+  - Document important private members
+  - Include concise summaries
+  - Add examples where helpful
+  - Use dartdoc-compatible format
+
+## UI/UX Patterns
+
+### Theme Implementation
+* Color Handling:
+  - Use `withAlpha()` instead of `withOpacity()`
+  - Dark theme: `Colors.white.withAlpha(222)` for high-emphasis
+  - Light theme: `Colors.black.withAlpha(222)` for high-emphasis
+  - Explicit iconTheme configuration
+
+### Component Patterns
+* Icon Styling:
+  - Use `Theme.of(context).colorScheme.primary` for colored icons
+  - Consistent visual cues for toggleable icons
+  - Maintain visual consistency across views
+
+* Form Fields:
+  - TextController listeners for state preservation
+  - Appropriate keyboard types
+  - MaxLength configurations where needed
+  - State updates through controllers
+
+### Rich Text Integration
+* Flutter Quill Setup:
+  - Include required localization delegates
+  - Add flutter_localizations dependency
+  - Configure custom toolbars
+  - Handle state preservation
+
+## Data Management
+
+### Persistence Patterns
+* Local Storage:
+  - Drift for structured data
+  - Shared Preferences for simple data
+  - PowerSync for offline-first sync
+  - Proper provider invalidation
+
+### API Integration
+* Network Handling:
+  - Dio for HTTP client
+  - Supabase for backend services
+  - Error handling patterns
+  - Response mapping
+
+## Testing Patterns
+
+### Unit Testing
+* Business Logic:
+  - Isolated state
+  - Comprehensive coverage
+  - Mock dependencies
+  - Clear test descriptions
+
+### Widget Testing
+* UI Components:
+  - Theme testing
+  - Accessibility checks
+  - Interaction testing
+  - State management verification
+
+### Integration Testing
+* Feature Testing:
+  - End-to-end flows
+  - Cross-component interaction
+  - State persistence
+  - Error scenarios
+
+## Accessibility Patterns
+
+### Visual Design
+* Contrast Requirements:
+  - Sufficient contrast for all elements
+  - Theme-aware implementations
+  - Interactive element emphasis
+  - Icon visibility
+
+### Theme Support
+* Mode Handling:
+  - Light mode specifications
+  - Dark mode adaptations
+  - Color scheme consistency
+  - Interactive element visibility
+
+### Screen Reader Support
+* Semantic Labels:
+  - Meaningful descriptions
+  - Action clarity
+  - State announcements
+  - Navigation guidance
