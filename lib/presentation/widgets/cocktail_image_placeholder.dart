@@ -4,13 +4,13 @@ import 'package:flutter/material.dart';
 class CocktailImagePlaceholder extends StatelessWidget {
   /// Whether to display the "No Image Available" text
   final bool showText;
-  
+
   /// The size of the cocktail glass icon
   final double iconSize;
-  
+
   /// The background color of the placeholder
   final Color? backgroundColor;
-  
+
   /// Creates a new CocktailImagePlaceholder
   const CocktailImagePlaceholder({
     super.key,
@@ -18,12 +18,13 @@ class CocktailImagePlaceholder extends StatelessWidget {
     this.iconSize = 70,
     this.backgroundColor,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final bgColor = backgroundColor ?? theme.colorScheme.surfaceVariant;
-    
+    final bgColor =
+        backgroundColor ?? theme.colorScheme.surfaceContainerHighest;
+
     return Container(
       width: double.infinity,
       color: bgColor,
@@ -84,7 +85,7 @@ class CocktailImagePlaceholder extends StatelessWidget {
               Text(
                 'No Image Available',
                 style: TextStyle(
-                  fontSize: 14, 
+                  fontSize: 14,
                   color: theme.colorScheme.onSurfaceVariant,
                   fontStyle: FontStyle.italic,
                 ),

@@ -1,5 +1,4 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:spirituum/data/datasources/local/app_database.dart';
 import 'package:spirituum/data/datasources/local/drift_recipe_local_data_source.dart';
 import 'package:spirituum/data/datasources/local/recipe_local_data_source.dart';
 import 'package:spirituum/data/services/database_service.dart';
@@ -18,28 +17,35 @@ class RecipeRepositoryImpl implements RecipeRepository {
   RecipeRepositoryImpl(this._localDataSource);
 
   @override
-  Future<List<domain.Recipe>> getAllRecipes() => _localDataSource.getAllRecipes();
+  Future<List<domain.Recipe>> getAllRecipes() =>
+      _localDataSource.getAllRecipes();
 
   @override
-  Future<domain.Recipe?> getRecipeById(String id) => _localDataSource.getRecipeById(id);
+  Future<domain.Recipe?> getRecipeById(String id) =>
+      _localDataSource.getRecipeById(id);
 
   @override
-  Future<domain.Recipe> saveRecipe(domain.Recipe recipe) => _localDataSource.saveRecipe(recipe);
+  Future<domain.Recipe> saveRecipe(domain.Recipe recipe) =>
+      _localDataSource.saveRecipe(recipe);
 
   @override
   Future<void> deleteRecipe(String id) => _localDataSource.deleteRecipe(id);
 
   @override
-  Future<List<domain.Recipe>> getFavoriteRecipes() => _localDataSource.getFavoriteRecipes();
+  Future<List<domain.Recipe>> getFavoriteRecipes() =>
+      _localDataSource.getFavoriteRecipes();
 
   @override
-  Future<domain.Recipe> setFavorite(String id, bool isFavorite) => _localDataSource.setFavorite(id, isFavorite);
+  Future<domain.Recipe> setFavorite(String id, bool isFavorite) =>
+      _localDataSource.setFavorite(id, isFavorite);
 
   @override
-  Future<List<domain.Recipe>> searchRecipes(String query) => _localDataSource.searchRecipes(query);
+  Future<List<domain.Recipe>> searchRecipes(String query) =>
+      _localDataSource.searchRecipes(query);
 
   @override
-  Future<List<domain.Recipe>> getRecipesByTag(String tag) => _localDataSource.getRecipesByTag(tag);
+  Future<List<domain.Recipe>> getRecipesByTag(String tag) =>
+      _localDataSource.getRecipesByTag(tag);
 }
 
 /// Provider for RecipeLocalDataSource

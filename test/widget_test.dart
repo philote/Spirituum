@@ -8,7 +8,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:spirituum/main.dart';
 import 'package:spirituum/presentation/app.dart';
 
 void main() {

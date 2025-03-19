@@ -14,16 +14,13 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 class RecipeEditScreen extends ConsumerStatefulWidget {
   /// The ID of the recipe to edit, or null if creating a new recipe
   final String? recipeId;
-  
+
   /// Creates a new recipe edit screen
-  /// 
+  ///
   /// If [recipeId] is provided, the screen will edit an existing recipe.
   /// Otherwise, it will create a new recipe.
-  const RecipeEditScreen({
-    super.key,
-    this.recipeId,
-  });
-  
+  const RecipeEditScreen({super.key, this.recipeId});
+
   @override
   ConsumerState<RecipeEditScreen> createState() => _RecipeEditScreenState();
 }
@@ -39,24 +36,24 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
   late QuillController _aboutController;
   late QuillController _notesController;
   bool _alcoholic = false;
-  
+
   @override
   void initState() {
     super.initState();
     // Initialize the rich text editors with empty content
     _aboutController = QuillController.basic();
     _notesController = QuillController.basic();
-    
+
     // Add listeners to update the recipe
     _nameController.addListener(() {
       _updateRecipeFromForm();
     });
-    
+
     _altNameController.addListener(() {
       _updateRecipeFromForm();
     });
   }
-  
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -68,22 +65,25 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
     _notesController.dispose();
     super.dispose();
   }
-  
+
   // Helper method to convert Quill Delta to JSON string
   String _quillDeltaToJson(QuillController controller) {
     final plainText = controller.document.toPlainText().trim();
     if (plainText.isEmpty) return '';
-    
+
     return jsonEncode(controller.document.toDelta().toJson());
   }
-  
+
   // Helper method to set Quill controller from JSON string
-  void _setQuillControllerFromJson(QuillController controller, String? jsonString) {
+  void _setQuillControllerFromJson(
+    QuillController controller,
+    String? jsonString,
+  ) {
     if (jsonString == null || jsonString.isEmpty) {
       controller.clear();
       return;
     }
-    
+
     try {
       final dynamic delta = jsonDecode(jsonString);
       controller.document = Document.fromJson(delta);
@@ -93,7 +93,7 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
       controller.document.insert(0, jsonString);
     }
   }
-  
+
   // Update the form with recipe data
   void _updateFormWithRecipe(Recipe recipe) {
     if (_nameController.text != recipe.name) {
@@ -105,12 +105,12 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
     _glasswareController.text = recipe.glassware ?? '';
     _garnishController.text = recipe.garnish ?? '';
     _alcoholic = recipe.alcoholic;
-    
+
     // Set rich text fields
     _setQuillControllerFromJson(_aboutController, recipe.about);
     _setQuillControllerFromJson(_notesController, recipe.notes);
   }
-  
+
   // Create or update a recipe from form data
   Recipe _buildRecipeFromForm(Recipe? existingRecipe) {
     final name = _nameController.text.trim();
@@ -119,7 +119,7 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
     final garnish = _garnishController.text.trim();
     final about = _quillDeltaToJson(_aboutController);
     final notes = _quillDeltaToJson(_notesController);
-    
+
     if (existingRecipe == null) {
       return Recipe.create(
         name: name,
@@ -143,33 +143,38 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
       );
     }
   }
-  
+
   // Add a new tag to the recipe
   void _addTag(Recipe recipe) {
     if (_tagController.text.trim().isEmpty) return;
-    
-    ref.read(recipeEditControllerProvider(widget.recipeId).notifier)
-      .addTag(recipe, _tagController.text.trim());
+
+    ref
+        .read(recipeEditControllerProvider(widget.recipeId).notifier)
+        .addTag(recipe, _tagController.text.trim());
     _tagController.clear();
   }
-  
+
   // Update recipe from form data when text fields change
   void _updateRecipeFromForm() {
     ref.read(recipeEditControllerProvider(widget.recipeId)).whenData((recipe) {
       if (recipe == null) return;
-      
+
       final name = _nameController.text.trim();
       final altName = _altNameController.text.trim();
-      
+
       // Only update if values are different
-      if (name != recipe.name || (altName.isEmpty ? recipe.altName != null : altName != recipe.altName)) {
+      if (name != recipe.name ||
+          (altName.isEmpty
+              ? recipe.altName != null
+              : altName != recipe.altName)) {
         final updatedRecipe = recipe.copyWith(
           name: name,
           altName: altName.isEmpty ? null : altName,
         );
-        
-        ref.read(recipeEditControllerProvider(widget.recipeId).notifier)
-           .updateRecipe(updatedRecipe);
+
+        ref
+            .read(recipeEditControllerProvider(widget.recipeId).notifier)
+            .updateRecipe(updatedRecipe);
       }
     });
   }
@@ -177,8 +182,10 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
   @override
   Widget build(BuildContext context) {
     // Watch the recipe edit controller
-    final recipeAsync = ref.watch(recipeEditControllerProvider(widget.recipeId));
-    
+    final recipeAsync = ref.watch(
+      recipeEditControllerProvider(widget.recipeId),
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.recipeId == null ? 'Create Recipe' : 'Edit Recipe'),
@@ -187,11 +194,16 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
           TextButton(
             onPressed: () async {
               if (_formKey.currentState?.validate() ?? false) {
-                await recipeAsync.whenData((recipe) async {
+                recipeAsync.whenData((recipe) async {
                   if (recipe != null) {
                     final updatedRecipe = _buildRecipeFromForm(recipe);
-                    await ref.read(recipeEditControllerProvider(widget.recipeId).notifier)
-                      .saveRecipe(updatedRecipe);
+                    await ref
+                        .read(
+                          recipeEditControllerProvider(
+                            widget.recipeId,
+                          ).notifier,
+                        )
+                        .saveRecipe(updatedRecipe);
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Recipe saved')),
@@ -208,19 +220,17 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
       ),
       body: recipeAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(
-          child: Text('Error: $error'),
-        ),
+        error: (error, stack) => Center(child: Text('Error: $error')),
         data: (recipe) {
           if (recipe == null) {
             return const Center(child: Text('Recipe not found'));
           }
-          
+
           // Update form fields with recipe data when it loads
           WidgetsBinding.instance.addPostFrameCallback((_) {
             _updateFormWithRecipe(recipe);
           });
-          
+
           return Form(
             key: _formKey,
             child: SingleChildScrollView(
@@ -245,7 +255,7 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
                     textInputAction: TextInputAction.next,
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Alternative name (optional)
                   TextFormField(
                     controller: _altNameController,
@@ -257,7 +267,7 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
                     textInputAction: TextInputAction.next,
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Alcoholic toggle
                   SwitchListTile(
                     title: const Text('Alcoholic'),
@@ -270,7 +280,7 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
                     contentPadding: EdgeInsets.zero,
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Glassware
                   TextFormField(
                     controller: _glasswareController,
@@ -283,7 +293,7 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
                     textInputAction: TextInputAction.next,
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Garnish
                   TextFormField(
                     controller: _garnishController,
@@ -296,7 +306,7 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
                     textInputAction: TextInputAction.next,
                   ),
                   const SizedBox(height: 24),
-                  
+
                   // About (rich text)
                   const Text(
                     'About',
@@ -305,20 +315,24 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
                   const SizedBox(height: 8),
                   Container(
                     decoration: BoxDecoration(
-                      border: Border.all(color: Theme.of(context).colorScheme.outline),
+                      border: Border.all(
+                        color: Theme.of(context).colorScheme.outline,
+                      ),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     padding: const EdgeInsets.all(8),
                     child: Column(
                       children: [
-                        QuillSimpleToolbar(
-                          controller: _aboutController,
-                        ),
+                        QuillSimpleToolbar(controller: _aboutController),
                         Container(
                           height: 150,
                           decoration: BoxDecoration(
                             color: Theme.of(context).colorScheme.surface,
-                            border: Border.all(color: Theme.of(context).colorScheme.outline.withAlpha(127)),
+                            border: Border.all(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.outline.withAlpha(127),
+                            ),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           padding: const EdgeInsets.all(8),
@@ -330,7 +344,7 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  
+
                   // Tags
                   const Text(
                     'Tags',
@@ -362,32 +376,49 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
                   if (recipe.tags.isNotEmpty)
                     Wrap(
                       spacing: 8,
-                      children: recipe.tags.asMap().entries.map((entry) {
-                        return Chip(
-                          label: Text(entry.value.value),
-                          onDeleted: () {
-                            ref.read(recipeEditControllerProvider(widget.recipeId).notifier)
-                              .removeTag(recipe, entry.key);
-                          },
-                          backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                        );
-                      }).toList(),
+                      children:
+                          recipe.tags.asMap().entries.map((entry) {
+                            return Chip(
+                              label: Text(entry.value.value),
+                              onDeleted: () {
+                                ref
+                                    .read(
+                                      recipeEditControllerProvider(
+                                        widget.recipeId,
+                                      ).notifier,
+                                    )
+                                    .removeTag(recipe, entry.key);
+                              },
+                              backgroundColor:
+                                  Theme.of(
+                                    context,
+                                  ).colorScheme.primaryContainer,
+                            );
+                          }).toList(),
                     ),
                   const SizedBox(height: 24),
-                  
+
                   // Ingredients
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
                         'Ingredients',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       IconButton(
                         icon: const Icon(Icons.add),
                         onPressed: () {
-                          ref.read(recipeEditControllerProvider(widget.recipeId).notifier)
-                            .addIngredient(recipe);
+                          ref
+                              .read(
+                                recipeEditControllerProvider(
+                                  widget.recipeId,
+                                ).notifier,
+                              )
+                              .addIngredient(recipe);
                         },
                         tooltip: 'Add Ingredient',
                       ),
@@ -401,16 +432,26 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
                         ingredient: entry.value,
                         index: entry.key,
                         onUpdate: (ingredient) {
-                          ref.read(recipeEditControllerProvider(widget.recipeId).notifier)
-                            .updateIngredient(recipe, entry.key, ingredient);
+                          ref
+                              .read(
+                                recipeEditControllerProvider(
+                                  widget.recipeId,
+                                ).notifier,
+                              )
+                              .updateIngredient(recipe, entry.key, ingredient);
                         },
                         onDelete: () {
-                          ref.read(recipeEditControllerProvider(widget.recipeId).notifier)
-                            .removeIngredient(recipe, entry.key);
+                          ref
+                              .read(
+                                recipeEditControllerProvider(
+                                  widget.recipeId,
+                                ).notifier,
+                              )
+                              .removeIngredient(recipe, entry.key);
                         },
                       ),
                     );
-                  }).toList(),
+                  }),
                   if (recipe.ingredients.isEmpty)
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: 8.0),
@@ -420,20 +461,28 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
                       ),
                     ),
                   const SizedBox(height: 24),
-                  
+
                   // Instructions
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
                         'Instructions',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       IconButton(
                         icon: const Icon(Icons.add),
                         onPressed: () {
-                          ref.read(recipeEditControllerProvider(widget.recipeId).notifier)
-                            .addInstruction(recipe);
+                          ref
+                              .read(
+                                recipeEditControllerProvider(
+                                  widget.recipeId,
+                                ).notifier,
+                              )
+                              .addInstruction(recipe);
                         },
                         tooltip: 'Add Instruction',
                       ),
@@ -447,16 +496,30 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
                         instruction: entry.value,
                         index: entry.key,
                         onUpdate: (instruction) {
-                          ref.read(recipeEditControllerProvider(widget.recipeId).notifier)
-                            .updateInstruction(recipe, entry.key, instruction);
+                          ref
+                              .read(
+                                recipeEditControllerProvider(
+                                  widget.recipeId,
+                                ).notifier,
+                              )
+                              .updateInstruction(
+                                recipe,
+                                entry.key,
+                                instruction,
+                              );
                         },
                         onDelete: () {
-                          ref.read(recipeEditControllerProvider(widget.recipeId).notifier)
-                            .removeInstruction(recipe, entry.key);
+                          ref
+                              .read(
+                                recipeEditControllerProvider(
+                                  widget.recipeId,
+                                ).notifier,
+                              )
+                              .removeInstruction(recipe, entry.key);
                         },
                       ),
                     );
-                  }).toList(),
+                  }),
                   if (recipe.instructions.isEmpty)
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: 8.0),
@@ -466,7 +529,7 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
                       ),
                     ),
                   const SizedBox(height: 24),
-                  
+
                   // Notes (rich text)
                   const Text(
                     'Notes (Optional)',
@@ -475,20 +538,24 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
                   const SizedBox(height: 8),
                   Container(
                     decoration: BoxDecoration(
-                      border: Border.all(color: Theme.of(context).colorScheme.outline),
+                      border: Border.all(
+                        color: Theme.of(context).colorScheme.outline,
+                      ),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     padding: const EdgeInsets.all(8),
                     child: Column(
                       children: [
-                        QuillSimpleToolbar(
-                          controller: _notesController,
-                        ),
+                        QuillSimpleToolbar(controller: _notesController),
                         Container(
                           height: 150,
                           decoration: BoxDecoration(
                             color: Theme.of(context).colorScheme.surface,
-                            border: Border.all(color: Theme.of(context).colorScheme.outline.withAlpha(127)),
+                            border: Border.all(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.outline.withAlpha(127),
+                            ),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           padding: const EdgeInsets.all(8),
@@ -499,7 +566,7 @@ class _RecipeEditScreenState extends ConsumerState<RecipeEditScreen> {
                       ],
                     ),
                   ),
-                  
+
                   const SizedBox(height: 32),
                 ],
               ),

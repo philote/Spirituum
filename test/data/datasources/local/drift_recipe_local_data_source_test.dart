@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:drift/native.dart';
 import 'package:spirituum/data/datasources/local/app_database.dart' as db;
@@ -56,8 +55,14 @@ void main() {
         const domain.Instruction(value: 'Add ice to a mixing glass', step: 1),
         const domain.Instruction(value: 'Add gin and vermouth', step: 2),
         const domain.Instruction(value: 'Stir well until chilled', step: 3),
-        const domain.Instruction(value: 'Strain into a chilled martini glass', step: 4),
-        const domain.Instruction(value: 'Garnish with olive or lemon twist', step: 5),
+        const domain.Instruction(
+          value: 'Strain into a chilled martini glass',
+          step: 4,
+        ),
+        const domain.Instruction(
+          value: 'Garnish with olive or lemon twist',
+          step: 5,
+        ),
       ],
       ingredients: [
         domain.Ingredient(
@@ -84,24 +89,36 @@ void main() {
     expect(retrievedRecipe!.name, equals('Test Martini'));
     expect(retrievedRecipe.altName, equals('Test Classic Martini'));
     expect(retrievedRecipe.alcoholic, isTrue);
-    
+
     // Check tags were saved
     expect(retrievedRecipe.tags.length, equals(3));
     expect(retrievedRecipe.tags.map((t) => t.value).contains('Gin'), isTrue);
-    expect(retrievedRecipe.tags.map((t) => t.value).contains('Vermouth'), isTrue);
-    expect(retrievedRecipe.tags.map((t) => t.value).contains('Classic'), isTrue);
-    
+    expect(
+      retrievedRecipe.tags.map((t) => t.value).contains('Vermouth'),
+      isTrue,
+    );
+    expect(
+      retrievedRecipe.tags.map((t) => t.value).contains('Classic'),
+      isTrue,
+    );
+
     // Check instructions were saved in order
     expect(retrievedRecipe.instructions.length, equals(5));
     expect(retrievedRecipe.instructions[0].step, equals(1));
     expect(retrievedRecipe.instructions[1].step, equals(2));
     expect(retrievedRecipe.instructions[4].step, equals(5));
-    
+
     // Check ingredients were saved
     expect(retrievedRecipe.ingredients.length, equals(2));
-    expect(retrievedRecipe.ingredients.map((i) => i.name).contains('Gin'), isTrue);
-    expect(retrievedRecipe.ingredients.map((i) => i.name).contains('Dry Vermouth'), isTrue);
-    
+    expect(
+      retrievedRecipe.ingredients.map((i) => i.name).contains('Gin'),
+      isTrue,
+    );
+    expect(
+      retrievedRecipe.ingredients.map((i) => i.name).contains('Dry Vermouth'),
+      isTrue,
+    );
+
     // Check specific ingredient details
     final gin = retrievedRecipe.ingredients.firstWhere((i) => i.name == 'Gin');
     expect(gin.amount.value, equals(60));

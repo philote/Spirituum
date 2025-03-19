@@ -6,13 +6,13 @@ import 'package:spirituum/presentation/widgets/cocktail_image_placeholder.dart';
 class RecipeListItem extends StatelessWidget {
   /// The recipe to display
   final Recipe recipe;
-  
+
   /// Callback when the item is tapped
   final VoidCallback onTap;
-  
+
   /// Callback when the favorite button is tapped
   final VoidCallback onFavoriteToggle;
-  
+
   /// Creates a new recipe list item
   const RecipeListItem({
     super.key,
@@ -20,11 +20,11 @@ class RecipeListItem extends StatelessWidget {
     required this.onTap,
     required this.onFavoriteToggle,
   });
-  
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 4.0),
       clipBehavior: Clip.antiAlias,
@@ -42,18 +42,21 @@ class RecipeListItem extends StatelessWidget {
                 child: SizedBox(
                   width: 80,
                   height: 80,
-                  child: recipe.imagePath != null && recipe.imagePath!.isNotEmpty
-                      ? Image.asset(
-                          recipe.imagePath!,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => _buildImagePlaceholder(context),
-                        )
-                      : _buildImagePlaceholder(context),
+                  child:
+                      recipe.imagePath != null && recipe.imagePath!.isNotEmpty
+                          ? Image.asset(
+                            recipe.imagePath!,
+                            fit: BoxFit.cover,
+                            errorBuilder:
+                                (context, error, stackTrace) =>
+                                    _buildImagePlaceholder(context),
+                          )
+                          : _buildImagePlaceholder(context),
                 ),
               ),
-              
+
               const SizedBox(width: 16),
-              
+
               // Recipe info
               Expanded(
                 child: Column(
@@ -68,7 +71,7 @@ class RecipeListItem extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    
+
                     // Alternate name (if available)
                     if (recipe.altName != null) ...[
                       const SizedBox(height: 2),
@@ -81,17 +84,19 @@ class RecipeListItem extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ],
-                    
+
                     const SizedBox(height: 4),
-                    
+
                     // Tags (limited to 3)
                     if (recipe.tags.isNotEmpty) ...[
                       SizedBox(
                         height: 24,
                         child: ListView.separated(
                           scrollDirection: Axis.horizontal,
-                          itemCount: recipe.tags.length > 3 ? 3 : recipe.tags.length,
-                          separatorBuilder: (context, _) => const SizedBox(width: 4),
+                          itemCount:
+                              recipe.tags.length > 3 ? 3 : recipe.tags.length,
+                          separatorBuilder:
+                              (context, _) => const SizedBox(width: 4),
                           itemBuilder: (context, index) {
                             final tag = recipe.tags[index];
                             return Chip(
@@ -100,15 +105,17 @@ class RecipeListItem extends StatelessWidget {
                                 style: const TextStyle(fontSize: 11),
                               ),
                               visualDensity: VisualDensity.compact,
-                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              materialTapTargetSize:
+                                  MaterialTapTargetSize.shrinkWrap,
                               padding: EdgeInsets.zero,
-                              backgroundColor: theme.colorScheme.secondaryContainer,
+                              backgroundColor:
+                                  theme.colorScheme.secondaryContainer,
                             );
                           },
                         ),
                       ),
                     ],
-                    
+
                     // Recipe type (alcoholic or non-alcoholic)
                     const SizedBox(height: 4),
                     Row(
@@ -128,7 +135,7 @@ class RecipeListItem extends StatelessWidget {
                   ],
                 ),
               ),
-              
+
               // Favorite button
               IconButton(
                 icon: Icon(
@@ -136,7 +143,10 @@ class RecipeListItem extends StatelessWidget {
                   color: recipe.isFavorite ? theme.colorScheme.primary : null,
                 ),
                 onPressed: onFavoriteToggle,
-                tooltip: recipe.isFavorite ? 'Remove from favorites' : 'Add to favorites',
+                tooltip:
+                    recipe.isFavorite
+                        ? 'Remove from favorites'
+                        : 'Add to favorites',
                 iconSize: 24,
               ),
             ],
@@ -145,13 +155,15 @@ class RecipeListItem extends StatelessWidget {
       ),
     );
   }
-  
+
   /// Builds a placeholder for when the recipe has no image
   Widget _buildImagePlaceholder(BuildContext context) {
     return CocktailImagePlaceholder(
       showText: false,
       iconSize: 40,
-      backgroundColor: Theme.of(context).colorScheme.surfaceVariant.withAlpha(180),
+      backgroundColor: Theme.of(
+        context,
+      ).colorScheme.surfaceContainerHighest.withAlpha(180),
     );
   }
 }
